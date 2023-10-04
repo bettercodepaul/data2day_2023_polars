@@ -1,4 +1,4 @@
-pandas == 2.1.1
+pandas == 1.5.3
 polars == 0.19.3
 plotly == 5.15.0
 notebook
