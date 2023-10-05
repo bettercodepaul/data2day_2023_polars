@@ -1,5 +1,7 @@
 from IPython.display import IFrame
 import polars as pl
+import plotly.express as px
+from polars.testing import assert_frame_equal
 
 URL_TRACK_ID_PREFIX = "https://open.spotify.com/track/"
 
@@ -13,6 +15,35 @@ def play_song(df, index=0):
 
     url = f"https://open.spotify.com/embed/track/{trackId}?utm_source=generator"
     return(IFrame(src=url, width="100%", height=152, style="border-radius:12px", frameBorder="0", allowfullscreen="", allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", loading="lazy"))
+
+def plot_rank(df):
+  plot_df = df.with_columns([
+      (pl.col("title") + " by " + pl.col("artist") + " (" + pl.col("region") + ", " + pl.col("chart") + ")").alias("label")
+  ]).sort("date")
+  fig = px.line(
+      plot_df,
+      x = "date",
+      y = "rank",
+      color = "label",
+      title = "Daily Spotify Rank",
+  )
+  fig.update_layout(
+      yaxis = dict(autorange="reversed")
+  )
+  return(fig)
+
+def plot_streams(df):
+  plot_df = df.with_columns([
+      (pl.col("title") + " by " + pl.col("artist") + " (" + pl.col("region") + ", " + pl.col("chart") + ")").alias("label")
+  ]).sort("date")
+  fig = px.line(
+      plot_df,
+      x = "date",
+      y = "streams",
+      color = "label",
+      title = "Daily Spotify Streams",
+  )
+  return(fig)
 
 
 def assert_approx(actual, expected, tol=0.001):
@@ -38,6 +69,9 @@ class HintSolution:
         print(self._solution)
 
     def check(self, *args):
+        if type(args[0]) == type(Ellipsis):
+            print("❓ Moment, die drei Punkte musst du mit deiner Lösung ersetzen!")
+            return
         try:
             self._check(*args)
             check_result = True
@@ -72,17 +106,27 @@ class HintSolution:
                 #print("🤔 It's tough, but don't lose hope! Maybe consider using the hint() method now? 😓")
                 print("🤔 Es ist schwierig, aber verlier nicht die Hoffnung! Hast du schon die hint() Methode verwendet? 😓")
             self.tries = self.tries + 1
-            
+
+def q0_check(x):
+    assert x == "BettercallPaul"
+
+q0 = HintSolution(
+    'Bei welcher Firma arbeiten Tobi und Thomas?',
+    q0_check,
+    'Es ist nicht BettercallSaul.',
+    'coole_firma = "BettercallPaul"'
+)
+
 
 def q1_check(df):
     assert df.shape == (362_182, 4)
     assert df.columns == ["date", "rank", "title", "artist"]
 
 q1 = HintSolution(
-    'Selektiere nur die Spalten "date", "rank", "title" und "artist".',
+    'Selektiere vom Dataframe "df" nur die Spalten "date", "rank", "title" und "artist".',
     q1_check,
     'Achte auf die Reihenfolge der Spalten und nutze die Methode "select".',
-    'q1_df = df.select(["date", "rank", "title", "artist"])'
+    'q1_df = df.select("date", "rank", "title", "artist")'
 )
 
 
@@ -92,10 +136,10 @@ def q2_check(df):
     assert df.columns == ["date", "rank", "title", "performer"]
 
 q2 = HintSolution(
-    'Selektiere nur die Spalten "date", "rank", "title" und "artist", aber benenne die Spalte "artist" in "performer" um.',
+    'Selektiere nun die Spalten "date", "rank", "title" und "artist", aber benenne die Spalte "artist" in "performer" um.',
     q2_check,
     'Du kannst die Funktion "alias" nutzen, um eine Spalte umzubenennen.',
-    'q2_df = df.select(["date", "rank", "title", pl.col("artist").alias("performer")])'
+    'q2_df = df.select("date", "rank", "title", pl.col("artist").alias("performer"))'
 )
 
 
@@ -146,5 +190,32 @@ q5 = HintSolution(
     '''
 q5_df = df.filter(pl.col("date").eq(pl.date(2017, 12, 31)) & pl.col("rank").eq(1))
 play_song(q5_df)
+    '''
+)
+
+def q6_check(result):
+    expected = pl.DataFrame({
+        "title": ["All I Want for Christmas Is You", "Last Christmas"],
+        "artist": ["Mariah Carey", "Wham!"],
+        "date_min": ["2017-11-11", "2017-11-11"],
+        "date_max": ["2021-12-20", "2021-12-20"]
+    }).with_columns(pl.col("date_min", "date_max").str.to_date())
+    actual = result.select("title", "artist", pl.col("date").min().suffix("_min"), pl.col("date").max().suffix("_max")).unique()
+    assert_frame_equal(expected, actual, check_row_order=False)
+
+q6 = HintSolution(
+    '''
+🎄🎅🏻 X-Mas-Showdown 🎅🏻🎄
+"Last Christmas" von "Wham!" oder "All I Want for Christmas Is You" von "Mariah Carey"???
+Filter auf die beiden Lieder und plotte dann die Streams. Was ist dein Favorit?
+    ''',
+    q6_check,
+    'Du brauchst einen Filter in der Form (TITEL_1 und KÜNSTLER_1) oder (TITEL_2 und KÜNSTLER_2) und die Methode "plot_streams".',
+    '''
+q6_df = df.filter(
+    (pl.col("title").eq("All I Want for Christmas Is You") & pl.col("artist").eq("Mariah Carey")) |
+    (pl.col("title").eq("Last Christmas") & pl.col("artist").eq("Wham!"))
+)
+plot_streams(q6_df)
     '''
 )
