@@ -22,7 +22,7 @@ def assert_approx(actual, expected, tol=0.001):
 class HintSolution:
 
     def __init__(self, question, check, hint, solution):
-        self.tries = 0
+        self.tries = 1
         self._question = question
         self._hint = hint
         self._check = check
@@ -44,7 +44,6 @@ class HintSolution:
         except:
             check_result = False
         
-        self.tries = self.tries + 1
         if check_result:
             if self.tries == 1:
                 #print("✅ Wow, first try and you nailed it! You're a natural problem-solver! 🎉👏")
@@ -72,7 +71,8 @@ class HintSolution:
             else:
                 #print("🤔 It's tough, but don't lose hope! Maybe consider using the hint() method now? 😓")
                 print("🤔 Es ist schwierig, aber verlier nicht die Hoffnung! Hast du schon die hint() Methode verwendet? 😓")
-
+            self.tries = self.tries + 1
+            
 
 def q1_check(df):
     assert df.shape == (362_182, 4)
