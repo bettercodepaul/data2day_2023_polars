@@ -2,6 +2,7 @@ from IPython.display import IFrame
 import polars as pl
 import plotly.express as px
 from polars.testing import assert_frame_equal
+import datetime
 
 URL_TRACK_ID_PREFIX = "https://open.spotify.com/track/"
 
@@ -16,32 +17,33 @@ def play_song(df, index=0):
     url = f"https://open.spotify.com/embed/track/{trackId}?utm_source=generator"
     return(IFrame(src=url, width="100%", height=152, style="border-radius:12px", frameBorder="0", allowfullscreen="", allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", loading="lazy"))
 
-def plot_rank(df):
-  plot_df = df.with_columns([
-      (pl.col("title") + " by " + pl.col("artist") + " (" + pl.col("region") + ", " + pl.col("chart") + ")").alias("label")
-  ]).sort("date")
+def plot_rank(df, title="Daily Spotify Rank"):
+  plot_df = df.with_columns(
+      pl.format("{} by {} ({}, {})", "title", "artist", "region", "chart").alias("label"),
+ #     (pl.col("title") + " by " + pl.col("artist") + " (" + pl.col("region") + ", " + pl.col("chart") + ")").alias("label")
+  ).sort("date")
   fig = px.line(
       plot_df,
       x = "date",
       y = "rank",
       color = "label",
-      title = "Daily Spotify Rank",
+      title = title,
   )
   fig.update_layout(
       yaxis = dict(autorange="reversed")
   )
   return(fig)
 
-def plot_streams(df):
-  plot_df = df.with_columns([
-      (pl.col("title") + " by " + pl.col("artist") + " (" + pl.col("region") + ", " + pl.col("chart") + ")").alias("label")
-  ]).sort("date")
+def plot_streams(df, title="Daily Spotify Streams"):
+  plot_df = df.with_columns(
+      pl.format("{} by {} ({}, {})", "title", "artist", "region", "chart").alias("label"),
+  ).sort("date")
   fig = px.line(
       plot_df,
       x = "date",
       y = "streams",
       color = "label",
-      title = "Daily Spotify Streams",
+      title = title,
   )
   return(fig)
 
@@ -49,6 +51,13 @@ def plot_streams(df):
 def assert_approx(actual, expected, tol=0.001):
     assert abs(actual - expected) < abs(tol*expected)
 
+
+def get_value(df, column=0):
+    if type(df) == pl.dataframe.frame.DataFrame:
+        value = df.item(0, column)
+    else:
+        value = df
+    return value
 
 class HintSolution:
 
@@ -159,10 +168,8 @@ q3 = HintSolution(
 
 
 def q4_check(rank_1, rank_200):
-    if type(rank_1) == pl.dataframe.frame.DataFrame:
-        rank_1 = rank_1.item(0, 0)
-    if type(rank_200) == pl.dataframe.frame.DataFrame:
-        rank_200 = rank_200.item(0, 0)
+    rank_1 = get_value(rank_1)
+    rank_200 = get_value(rank_200)
 
     assert_approx(rank_1, 6_452_678)
     assert_approx(rank_200, 604_534)
@@ -179,8 +186,7 @@ rank_200 = df.filter(pl.col("rank").eq(200)).select(pl.col("streams").mean())
 
 
 def q5_check(result):
-    if type(result) == pl.dataframe.frame.DataFrame:
-        result = result.item(0, "title")
+    result = get_value(result, "title")
     assert result == "DÁKITI"
 
 q5 = HintSolution(
@@ -217,5 +223,150 @@ q6_df = df.filter(
     (pl.col("title").eq("Last Christmas") & pl.col("artist").eq("Wham!"))
 )
 plot_streams(q6_df)
+    '''
+)
+
+def q7_check(result):
+    expected = pl.DataFrame({
+        "title": ["Last Christmas"],
+        "artist": ["Wham!"],
+        "date_min": ["2017-12-24"],
+        "date_max": ["2020-12-25"]
+    }).with_columns(pl.col("date_min", "date_max").str.to_date())
+    actual = result.select("title", "artist", pl.col("date").min().suffix("_min"), pl.col("date").max().suffix("_max")).unique()
+    assert_frame_equal(expected, actual, check_row_order=False)
+
+q7 = HintSolution(
+    'Filter auf alle zweitplatzierten Lieder an Weihnachten (24. und 25. Dezember)!',
+    q7_check,
+    'Filter sowohl auf den Tag ("dt.day()") mit "is_between", auf Dezember ("dt.month()") und auf den Platz 2 ("rank").',
+    '''
+q7_df = df.filter(
+    pl.col("date").dt.month().eq(12) &
+    pl.col("date").dt.day().is_between(24, 25) &
+    pl.col("rank").eq(2)
+)
+    '''
+)
+
+def q8_check(monday, friday):
+    monday = get_value(monday, "streams")
+    friday = get_value(friday, "streams")
+    assert_approx(monday, 1_180_265)
+    assert_approx(friday, 1_325_348)
+
+q8 = HintSolution(
+    'Berechne die durchschnittliche Anzahl an Streams je Song an Montagen und an Freitagen!',
+    q8_check,
+    'Filter auf jeweils auf den Wochentag mit "dt.weekday()", beachte "Montag==1"',
+    '''
+q8_monday = df.filter(pl.col("date").dt.weekday().eq(1)).select(pl.col("streams").mean())
+q8_friday = df.filter(pl.col("date").dt.weekday().eq(5)).select(pl.col("streams").mean())
+    '''
+)
+
+def q9_check(result):
+    result = get_value(result)
+    assert (result - datetime.timedelta(days=14, hours=15, minutes=39)).total_seconds() < 60
+
+q9 = HintSolution(
+    'Wie viele Tage sind im Datensatz durchschnittlich seit dem jeweiligen Monatsbeginn vergangen?',
+    q9_check,
+    'Bilde den Mittelwert ("mean") über die Differenz vom Datum und Monatsbeginn ("dt.month_start()").',
+    '''
+q9_df = df.select((pl.col("date") - pl.col("date").dt.month_start()).mean())
+    '''
+)
+
+
+def q10_check(result):
+    expected = pl.DataFrame({
+        "artist": [
+            "Shawn Mendes, Zedd",
+            "Zedd, Maren Morris, Grey",
+            "Zedd, Jasmine Thompson",
+            "Zedd, Katy Perry",
+            "Hailee Steinfeld, Grey, Zedd",
+            "Zedd, Alessia Cara",
+            "Zedd, Elley Duhé"
+        ],
+    })
+    assert_frame_equal(expected, result, check_row_order=False)
+
+q10 = HintSolution(
+    'Erstelle eine Liste mit allen Künstler-Kooperationen bei denen "Zedd" mitgewirkt hat.',
+    q10_check,
+    'Filter auf alle Künstlernamen in den Zedd enthalten ist, aber die nicht genau Zedd sind. Benutze die Funktion "unique".',
+    '''
+q10_df = df.filter(pl.col("artist").str.contains("Zedd") & pl.col("artist").ne("Zedd")).select(pl.col("artist").unique())
+    '''
+)
+
+def q11_check(ohne_zedd, mit_zedd):
+    ohne_zedd = get_value(ohne_zedd)
+    mit_zedd = get_value(mit_zedd)
+    assert ohne_zedd == 101
+    assert mit_zedd == 6
+
+q11 = HintSolution(
+    'Was ist die höchste Chart-Platzierung, die "Maren Morris" mit "Zedd" erreicht hat? Und ohne ihn?',
+    q11_check,
+    'Filter auf Künstler-Namen die "Maren Morris" und/und nicht "Zedd" enthalten. Nutze den kleinsten Wert von "rank".',
+    '''
+q11_ohne_zedd = (
+    df.filter(
+        pl.col("artist").str.contains("Maren Morris") &
+        ~ pl.col("artist").str.contains("Zedd")
+    )
+    .select(pl.col("rank").min())
+)
+
+q11_mit_zedd = (
+    df.filter(
+        pl.col("artist").str.contains("Maren Morris") &
+        pl.col("artist").str.contains("Zedd")
+    )
+    .select(pl.col("rank").min())
+)
+    '''
+)
+
+
+
+def q12_check(df, result):
+    expected_size = df.with_columns(
+        pl.col("title").cast(pl.Categorical),
+        pl.col("artist").cast(pl.Categorical),
+        pl.col("trend").cast(pl.Categorical),
+        pl.col("region").cast(pl.Categorical),
+        pl.col("chart").cast(pl.Categorical),
+        pl.col("rank").cast(pl.UInt8),
+        pl.col("streams").cast(pl.UInt32),
+        pl.col("url").str.slice(len("https://open.spotify.com/track/")).cast(pl.Categorical)
+    ).estimated_size("mb")
+
+    actual_size = result.estimated_size("mb")
+
+    assert actual_size <= expected_size
+    
+
+q12 = HintSolution(
+    '''
+Minimiere den Speicherverbrauch des Dataframes durch andere Datentypen und das Entfernen eines unnötigen Präfix.
+Den Speicherverbrauch kannst du mit df.estimated_size("mb") anzeigen.
+    ''',
+    q12_check,
+    'Entferne den Präfix aus der Spalte "url" z.B. mit "str.replace" oder "str.slice", caste zu "pl.Categorical" für alle Strings, UInt8 bzw. UInt32 für die Zahlen.',
+    '''
+q12_df = df.with_columns(
+    pl.col("title").cast(pl.Categorical),
+    pl.col("artist").cast(pl.Categorical),
+    pl.col("trend").cast(pl.Categorical),
+    pl.col("region").cast(pl.Categorical),
+    pl.col("chart").cast(pl.Categorical),
+    pl.col("rank").cast(pl.UInt8),
+    pl.col("streams").cast(pl.UInt32),
+    pl.col("url").str.slice(len("https://open.spotify.com/track/")).cast(pl.Categorical)
+)
     '''
 )
