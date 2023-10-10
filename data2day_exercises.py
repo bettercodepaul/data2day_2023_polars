@@ -154,12 +154,11 @@ q2 = HintSolution(
 
 
 def q3_check(result):
-    if type(result) == pl.dataframe.frame.DataFrame:
-        result = result.item(0, 0)
+    result = get_value(result)
     assert_approx(result, 1_212_938)
 
 q3 = HintSolution(
-    'Wie oft wurde ein Lied durchschnittlich pro Tag gestreamt?',
+    'Was ist der Durchschnitt an Streams im Datensatz?',
     q3_check,
     'Du kannst pl.col("streams") mit der Funktion "mean" verbinden.',
     'q3_df = df.select(pl.col("streams").mean())'
@@ -187,7 +186,7 @@ rank_200 = df.filter(pl.col("rank").eq(200)).select(pl.col("streams").mean())
 
 def q5_check(result):
     result = get_value(result, "title")
-    assert result == "DÁKITI"
+    assert result == "rockstar"
 
 q5 = HintSolution(
     'Welches Lied war am Sylvesterabend 2017 auf Platz 1? Höre es auch gerne an.',
@@ -207,7 +206,7 @@ def q6_check(result):
         "date_max": ["2021-12-20", "2021-12-20"]
     }).with_columns(pl.col("date_min", "date_max").str.to_date())
     actual = result.select("title", "artist", pl.col("date").min().suffix("_min"), pl.col("date").max().suffix("_max")).unique()
-    assert_frame_equal(expected, actual, check_row_order=False)
+    assert_frame_equal(expected, actual, check_row_order=False, check_column_order=False)
 
 q6 = HintSolution(
     '''
@@ -234,7 +233,7 @@ def q7_check(result):
         "date_max": ["2020-12-25"]
     }).with_columns(pl.col("date_min", "date_max").str.to_date())
     actual = result.select("title", "artist", pl.col("date").min().suffix("_min"), pl.col("date").max().suffix("_max")).unique()
-    assert_frame_equal(expected, actual, check_row_order=False)
+    assert_frame_equal(expected, actual, check_row_order=False, check_column_order=False)
 
 q7 = HintSolution(
     'Filter auf alle zweitplatzierten Lieder an Weihnachten (24. und 25. Dezember)!',
@@ -291,7 +290,7 @@ def q10_check(result):
             "Zedd, Elley Duhé"
         ],
     })
-    assert_frame_equal(expected, result, check_row_order=False)
+    assert_frame_equal(expected, result, check_row_order=False, check_column_order=False)
 
 q10 = HintSolution(
     'Erstelle eine Liste mit allen Künstler-Kooperationen bei denen "Zedd" mitgewirkt hat.',
@@ -367,6 +366,220 @@ q12_df = df.with_columns(
     pl.col("rank").cast(pl.UInt8),
     pl.col("streams").cast(pl.UInt32),
     pl.col("url").str.slice(len("https://open.spotify.com/track/")).cast(pl.Categorical)
+)
+    '''
+)
+
+
+def q13_check(result):
+    expected = pl.DataFrame([
+        pl.Series("title", ['Sunflower - Spider-Man: Into the Spider-Verse', 'Someone You Loved', 'Dance Monkey', 'Blinding Lights', 'Shape of You'], dtype=pl.Utf8),
+        pl.Series("artist", ['Post Malone, Swae Lee', 'Lewis Capaldi', 'Tones And I', 'The Weeknd', 'Ed Sheeran'], dtype=pl.Utf8),
+        pl.Series("streams", [2046023015, 2111297778, 2373957880, 2623933279, 2921494072], dtype=pl.Int64),
+    ])
+
+    assert_frame_equal(expected, result, check_row_order=False, check_column_order=False)
+
+q13 = HintSolution(
+    '''
+Ermittel die 5 Songs mit den meisten Streams über den gesamten Zeitraum.
+    ''',
+    q13_check,
+    'Gruppiere nach "title" und "artist", aggregiere "streams" als Summe und filter mit der Funktion "top_k".',
+    '''
+q13_df = (df
+    .group_by("title", "artist")
+    .agg(pl.col("streams").sum())
+    .top_k(5, by="streams")
+)
+    '''
+)
+
+
+def q14_check(result):
+    expected = pl.DataFrame([
+        pl.Series("title", ['Shape of You', 'Blinding Lights', 'Dance Monkey', 'Someone You Loved', 'Sunflower - Spider-Man: Into the Spider-Verse'], dtype=pl.Utf8),
+        pl.Series("urlCount", [1, 3, 2, 2, 5], dtype=pl.UInt32),
+    ])
+
+    assert_frame_equal(expected, result.select("title", "urlCount"), check_row_order=False, check_column_order=False)
+
+q14 = HintSolution(
+    '''
+Ermittel die 5 Songs mit den meisten Streams über den gesamten Zeitraum und auch
+wie viele unterschiedliche "url"s je Song vorhanden sind ("urlCount") und eine (die erste) "url" je Song.
+Höre dir die Songs mit der Funktion "play_song" an.
+    ''',
+    q14_check,
+    'Wie Frage 13, aber zusätzlich mit "n_unique" (als "urlCount") und "first" auf der Spalte "url".',
+    '''
+q14_df = (df
+    .group_by("title", "artist")
+    .agg(pl.col("streams").sum(), pl.col("url").n_unique().alias("urlCount"), pl.col("url").first())
+    .top_k(5, by="streams")
+)
+play_song(q14_df, 0)
+    '''
+)
+
+
+
+def q15_check(result):
+    expected = pl.DataFrame([
+        pl.Series("title", ['Thinking out Loud', "Say You Won't Let Go", 'Shape of You', 'All of Me', 'Photograph'], dtype=pl.Utf8),
+    ])
+
+    assert_frame_equal(expected, result.select("title"), check_row_order=False, check_column_order=False)
+
+q15 = HintSolution(
+    '''
+Berechne pro Song den romantischen 💕 Valentins-Index ("valentinesIndex") als durchschnittliche Anzahl an Streams
+am Valentins-Tag geteilt durch die durchschnittliche Anzahl an Streams an allen anderen Tagen.
+Filter auf die 5 romantischsten Songs 😍 🎶 😍, die in jedem Jahr am Valentins-Tag in den Charts waren.
+Plotte die Streams für den romantischsten Song.
+    ''',
+    q15_check,
+    '''
+Lege ein Hilfs-Spalte "isValentinesDay" an, gruppiere nach Titel und Künstler und ermittel in der Aggregation
+die Anzahl der Jahre mit "n_unique" und filter die Aggregations-Ausdrücke mit der Hilfs-Spalte "isValentinesDay".
+    ''',
+    '''
+q15_df = (df
+    .with_columns((pl.col("date").dt.month().eq(2) & pl.col("date").dt.day().eq(14)).alias("isValentinesDay"))
+    .group_by("title", "artist")
+    .agg(
+        pl.col("date").filter(pl.col("isValentinesDay")).dt.year().n_unique().alias("valentineYears"),
+        (pl.col("streams").filter(pl.col("isValentinesDay")).mean()/pl.col("streams").filter(~pl.col("isValentinesDay")).mean()).alias("valentinesIndex"),
+    )
+    .filter(pl.col("valentineYears").eq(5))
+    .top_k(5, by="valentinesIndex")
+)
+plot_streams(df.filter(pl.col("title").eq("Thinking out Loud")))
+    '''
+)
+
+
+def q16_check(result):
+    expected_date = pl.DataFrame([
+        pl.Series("date", [datetime.date(2021, 12, 20)], dtype=pl.Date),
+    ])
+
+    expected_songs = pl.DataFrame([
+        pl.Series("artist", ['Mariah Carey', 'Michael Bublé', 'Wham!'], dtype=pl.Utf8),
+        pl.Series("title", ['All I Want for Christmas Is You', "It's Beginning to Look a Lot like Christmas", 'Last Christmas'], dtype=pl.Utf8),
+    ])
+
+    assert_frame_equal(expected_date, result.select(pl.col("date").max()), check_row_order=False, check_column_order=False)
+    assert_frame_equal(expected_songs, result.select("artist", "title").unique(), check_row_order=False, check_column_order=False)
+
+q16 = HintSolution(
+    '''
+Erstelle eine Liste mit Weihnachts-Liedern in dem Du auf alle Titel filterst, die das Wort "Christmas" enthalten.
+Gruppiere dann auf "url" und ermittel die Top-3 Songs mit den meisten Streams. Verbinde den Original-Datensatz und plotte
+die Streams der drei beliebtesten Weihnachtslieder.
+    ''',
+    q16_check,
+    '''
+Nutze einen eigenen Namen für die Summe aller Streams (z.B. "totalStreams"), nutze top_k und mache einen join auf "df" mit "url" als Schlüssel.
+    ''',
+    '''
+q16_df = (df
+    .filter(pl.col("title").str.contains("Christmas"))
+    .group_by("url")
+    .agg(pl.col("streams").sum().alias("totalStreams"))
+    .top_k(3, by="totalStreams")
+    .join(df, on="url")
+)
+plot_streams(q16_df)
+    '''
+)
+
+
+def q17_check(result):
+    expected = pl.DataFrame([
+        pl.Series("genre", ['pop music', 'hip hop music', 'contemporary R&B', 'dance-pop', 'trap music'], dtype=pl.Utf8),
+    ])
+
+    assert_frame_equal(expected, result.select("genre"), check_row_order=False, check_column_order=False)
+
+
+q17 = HintSolution(
+    '''
+Lese die Datei "track-genres.parquet" ein. Ergänze dann den Hauptdatensatz um diese Genres und ermittel die 5 am meisten gestreamten Musik-Genres.
+    ''',
+    q17_check,
+    '''
+Joine über die Spalte "url" und rolle die Spalte "genres" mit der Methode explode aus, bevor du gruppierst, aggregierst und auf die Top 5 filterst.
+    ''',
+    '''
+q17_df = (df
+    .join(pl.read_parquet("track-genres.parquet"), on="url")
+    .explode("genre")
+    .group_by("genre")
+    .agg(pl.col("streams").sum())
+    .top_k(5, by="streams")
+)
+    '''
+)
+
+
+def q18_check(result):
+    result = get_value(result)
+    assert_approx(result, 0.519)
+
+
+q18 = HintSolution(
+    '''
+Ermittel den Anteil der gesamten Streams für die wir ein oder mehrere Genres haben (z.B. 0.25 falls für 25% der Streams eine Genre-Angabe vorhanden ist).
+    ''',
+    q18_check,
+    '''
+Benutze einen Left-Join. Das Ergebnis sollte entweder eine Zahl kleiner als 1 mit 3 Nachkommastellen sein oder ein Dataframe mit genau einer Zeile und einer Spalte sein.
+    ''',
+    '''
+q18_df = (df
+    .join(pl.read_parquet("track-genres.parquet"), on="url", how="left")
+    .group_by(pl.col("genre").is_not_null().alias("knownGenre"))
+    .agg(pl.col("streams").sum())
+    .with_columns(pl.col("streams")/pl.col("streams").sum())
+    .select(pl.col("streams").filter(pl.col("knownGenre")))
+)
+    '''
+)
+
+
+def q19_check(result):
+    expected = pl.DataFrame([
+        pl.Series("artist", ['Drake', 'Taylor Swift', 'Ariana Grande', 'Mariah Carey', 'Billie Eilish', 'Post Malone'], dtype=pl.Utf8),
+        pl.Series("2020", [1, 2, 2, 1, 2, 0], dtype=pl.UInt32),
+        pl.Series("2018", [4, 0, 1, 1, 0, 3], dtype=pl.UInt32),
+        pl.Series("2019", [0, 1, 2, 1, 2, 1], dtype=pl.UInt32),
+        pl.Series("2017", [0, 1, 0, 1, 0, 0], dtype=pl.UInt32),
+        pl.Series("2021", [2, 1, 0, 1, 0, 0], dtype=pl.UInt32),
+        pl.Series("allYears", [7, 5, 5, 5, 4, 4], dtype=pl.UInt32),
+    ])
+    assert_frame_equal(expected, result, check_row_order=False, check_column_order=False)
+
+
+q19 = HintSolution(
+    '''
+Erstelle einen Dataframe der für jeden Künstler die Anzahl der Nr. 1 Hits je Jahr in getrennten Spalten ausweist.
+Erstelle zusätzlich eine Spalte für die Gesamtanzahl an Nr. 1 Hits ("allYears") und
+filtere auf die 6 Künstler mit den meisten Nr. 1 Hits ("allYears").
+    ''',
+    q19_check,
+    '''
+Filter auf die Nr. 1 Hits, zähle die eindeutigen Titelnamen je Jahr und Künstler und pivotiere dann.
+    ''',
+    '''
+q19_df = (df
+    .filter(pl.col("rank").eq(1))
+    .group_by("artist", pl.col("date").dt.year().alias("year"))
+    .agg(pl.col("title").n_unique().alias("numberOnes"))
+    .pivot(index="artist", columns="year", values="numberOnes")
+    .fill_null(0)
+    .with_columns(pl.sum_horizontal(pl.all().exclude("artist")).alias("allYears"))
+    .top_k(6, by="allYears")
 )
     '''
 )
