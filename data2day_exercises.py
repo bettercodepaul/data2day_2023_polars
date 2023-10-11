@@ -583,3 +583,22 @@ q19_df = (df
 )
     '''
 )
+
+
+q20 = HintSolution(
+    '''
+Schreibe die Musterlösung von Frage 12 so um, dass die String-Spalten nicht einzeln
+mit einem Namen selektiert werden.
+    ''',
+    q12_check,
+    'Entferne alle Casts zu Categorical aus der Musterlösung und mache den finalen Cast in einem zusätzlichen "with_columns".',
+    '''
+q20_df = (df
+    .with_columns(
+        pl.col("rank").cast(pl.UInt8),
+        pl.col("streams").cast(pl.UInt32),
+        pl.col("url").str.slice(len("https://open.spotify.com/track/"))
+    )
+    .with_columns(pl.col(pl.Utf8).cast(pl.Categorical)))
+    '''
+)
