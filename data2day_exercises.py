@@ -293,7 +293,7 @@ def q10_check(result):
     assert_frame_equal(expected, result, check_row_order=False, check_column_order=False)
 
 q10 = HintSolution(
-    'Erstelle eine Liste mit allen Künstler-Kooperationen bei denen "Zedd" mitgewirkt hat.',
+    'Erstelle einen Dataframe mit allen Künstler-Kooperationen bei denen "Zedd" mitgewirkt hat.',
     q10_check,
     'Filter auf alle Künstlernamen in den Zedd enthalten ist, aber die nicht genau Zedd sind. Benutze die Funktion "unique".',
     '''
