@@ -682,8 +682,8 @@ def q24_check(result):
 
 q24 = HintSolution(
     '''
-Berechne pro Kontinent für wie viele Sylverster-Abende es Einträge für die "top200" gibt (sowohl
-am 31. als auch 25. Dezember). Nenne die Spalte mit den Jahren "xmasYears".
+Berechne pro Kontinent für wie viele Weihnachten es Einträge für die "top200" gibt (sowohl
+am 24. als auch 25. Dezember). Nenne die Spalte mit den Jahren "xmasYears".
     ''',
     q24_check,
     'Lade "region-info.csv" mit "pl.scan_csv" und joine, filter auf "top200" und Weihnachten und nutze "dt.year().n_unique()"',
