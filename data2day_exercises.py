@@ -734,27 +734,18 @@ xmasYears_per_continent = (df
     .join(region_df, on="region")
     .group_by("continent")
     .agg(pl.col("date").dt.year().n_unique().alias("xmasYears"))
-    .collect()
 )
 
-
 q25_df = (df
-    .join(region_df, on="region")
-    .with_columns((pl.col("date").dt.month().eq(12) & pl.col("date").dt.day().is_between(1, 26)).alias("isXmasTime"))
-    .filter(
-        pl.col("date").filter(
-            pl.col("isXmasTime")
-        ).n_unique().eq(
-        
-        )
-    ))
+    .filter((pl.col("date").dt.month().eq(12) & pl.col("date").dt.day().is_between(24, 25)))
+    .join(region_df, on="region")    
     .group_by("title", "artist", "continent")
     .agg(
-        pl.col("date").filter(pl.col("isXmasTime")).dt.year().n_unique().alias("xmasYears"),
-        (pl.col("streams").filter(pl.col("isXmasTime")).mean()/pl.col("streams").filter(~pl.col("isXmasTime")).mean()).alias("xmasIndex"),
+        pl.col("date").dt.year().n_unique().alias("xmasYears"),
+        pl.col("streams").sum()
     )
-    .filter(pl.col("xmasYears").eq(5))
-    .sort("xmasIndex", descending=True)
+    .join(xmasYears_per_continent, on=["continent", "xmasYears"])
+    .sort("streams", descending=True)
     .group_by("continent")
     .head(2)
     .collect()
