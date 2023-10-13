@@ -602,3 +602,162 @@ q20_df = (df
     .with_columns(pl.col(pl.Utf8).cast(pl.Categorical)))
     '''
 )
+
+def q21_check(result):
+    expected = pl.DataFrame([
+        pl.Series("region", ['Global', 'United States', 'Brazil', 'Mexico', 'Germany', 'United Kingdom', 'Spain', 'Italy', 'France', 'Australia'], dtype=pl.Utf8),
+    ])
+    assert_frame_equal(expected, result.select("region"), check_row_order=False, check_column_order=False)
+
+q21 = HintSolution(
+    '''
+Ermittel die 10 Regionen mit den meisten Streams.
+    ''',
+    q21_check,
+    'Gruppiere nach "region", aggregiere und dann top-k.',
+    '''
+q21_df = (df
+    .group_by("region")
+    .agg(pl.col("streams").sum())
+    .top_k(10, by="streams")
+    .collect()
+)
+    '''
+)
+
+
+def q22_check(result):
+    expected = pl.DataFrame([
+        pl.Series("region", ['Norway', 'Sweden', 'Iceland', 'Denmark', 'Netherlands', 'Finland', 'Chile', 'New Zealand', 'Ireland', 'Australia'], dtype=pl.Utf8),
+    ])
+    assert_frame_equal(expected, result.select("region"), check_row_order=False, check_column_order=False)
+
+q22 = HintSolution(
+    '''
+Lade zusätzlich die Datei region-info.csv und ermittel jetzt die 10 Regionen mit
+den meisten Streams relativ zur Bevölkerung.
+    ''',
+    q22_check,
+    'Lade "region-info.csv" mit "pl.scan_csv", teile die Summe der Streams durch "population".',
+    '''
+region_df = pl.scan_csv("region-info.csv")
+q22_df = (df
+    .group_by("region")
+    .agg(pl.col("streams").sum())
+    .join(region_df, on="region")
+    .with_columns(pl.col("streams")/pl.col("population"))
+    .top_k(10, by="streams")
+    .collect()
+)
+    '''
+)
+
+
+
+def q23_check(result):
+    expected = pl.DataFrame([
+        pl.Series("chart", ['viral50', 'top200'], dtype=pl.Utf8),
+    ])
+    assert_frame_equal(expected, result, check_row_order=False, check_column_order=False)
+
+
+q23 = HintSolution(
+    '''
+Ermittel die unterschiedlichen Werte für die Spalte "chart".
+    ''',
+    q23_check,
+    'Du kannst die Funktion "unique" verwenden.',
+    '''
+q23_df = df.select(pl.col("chart").unique()).collect()
+    '''
+)
+
+
+def q24_check(result):
+    expected = pl.DataFrame([
+        pl.Series("continent", ['Asia,Europe', 'Europe,Asia', 'North America', 'Oceania', 'Africa', 'Earth', 'Asia', 'Europe', 'South America'], dtype=pl.Utf8),
+        pl.Series("xmasYears", [4, 1, 5, 4, 3, 4, 5, 5, 5], dtype=pl.UInt32),
+    ])
+    assert_frame_equal(expected, result, check_row_order=False, check_column_order=False)
+
+q24 = HintSolution(
+    '''
+Berechne pro Kontinent für wie viele Sylverster-Abende es Einträge für die "top200" gibt (sowohl
+am 31. als auch 25. Dezember). Nenne die Spalte mit den Jahren "xmasYears".
+    ''',
+    q24_check,
+    'Lade "region-info.csv" mit "pl.scan_csv" und joine, filter auf "top200" und Weihnachten und nutze "dt.year().n_unique()"',
+    '''
+region_df = pl.scan_csv("region-info.csv")
+q24_df = (df
+    .filter(
+        pl.col("chart").eq("top200") &
+        pl.col("date").dt.month().eq(12) &
+        pl.col("date").dt.day().is_between(24, 25)
+    )
+    .join(region_df, on="region")
+    .group_by("continent")
+    .agg(pl.col("date").dt.year().n_unique().alias("xmasYears"))
+    .collect()
+)
+    '''
+)
+
+def q25_check(result):
+    expected = pl.DataFrame([
+        pl.Series("continent", ['Earth', 'Earth', 'North America', 'North America', 'Europe', 'Europe', 'South America', 'South America', 'Asia,Europe', 'Asia,Europe', 'Asia', 'Asia', 'Oceania', 'Oceania', 'Europe,Asia', 'Europe,Asia', 'Africa', 'Africa'], dtype=pl.Utf8),
+        pl.Series("artist", ['Mariah Carey', 'Wham!', 'Mariah Carey', 'Bobby Helms', 'Mariah Carey', 'Wham!', 'Mariah Carey', 'Bobby Helms', 'Ezhel', 'Yüzyüzeyken Konuşuruz', 'Mariah Carey', 'Ariana Grande', 'Mariah Carey', 'Wham!', 'Big Baby Tape', 'SLAVA MARLOW', 'Mariah Carey', 'Wham!'], dtype=pl.Utf8),
+        pl.Series("title", ['All I Want for Christmas Is You', 'Last Christmas', 'All I Want for Christmas Is You', 'Jingle Bell Rock', 'All I Want for Christmas Is You', 'Last Christmas', 'All I Want for Christmas Is You', 'Jingle Bell Rock', 'Geceler', 'Ne Farkeder', 'All I Want for Christmas Is You', 'Santa Tell Me', 'All I Want for Christmas Is You', 'Last Christmas', 'KARI', 'Снова я напиваюсь', 'All I Want for Christmas Is You', 'Last Christmas'], dtype=pl.Utf8),
+    ])
+    assert_frame_equal(expected, result.select("continent", "title", "artist"), check_row_order=False, check_column_order=False)
+
+q25 = HintSolution(
+    '''
+Schwieriger Endgegner: Berechne die Top-Weihnachts-Songs je Kontinent.
+
+- Erstelle einen Dataframe mit Kontinent und Anzahl an Weihnachten (siehe q24)
+- Filter dann den Datensatz zuerst auf Songs die an jedem Weihnachten,
+dass für den Kontinent im Datensatz enthalten ist, auch in den Top-200 waren.
+- Ermittel dann von diesen Songs je Kontinent welche an Weihnachten am meisten gespielt wurden
+- Erstelle einen Dataframe mit den Top-2 je Kontinent
+    ''',
+    q25_check,
+    '',
+    '''
+region_df = pl.scan_csv("region-info.csv")
+xmasYears_per_continent = (df
+    .filter(
+        pl.col("chart").eq("top200") &
+        pl.col("date").dt.month().eq(12) &
+        pl.col("date").dt.day().is_between(24, 25)
+    )
+    .join(region_df, on="region")
+    .group_by("continent")
+    .agg(pl.col("date").dt.year().n_unique().alias("xmasYears"))
+    .collect()
+)
+
+
+q25_df = (df
+    .join(region_df, on="region")
+    .with_columns((pl.col("date").dt.month().eq(12) & pl.col("date").dt.day().is_between(1, 26)).alias("isXmasTime"))
+    .filter(
+        pl.col("date").filter(
+            pl.col("isXmasTime")
+        ).n_unique().eq(
+        
+        )
+    ))
+    .group_by("title", "artist", "continent")
+    .agg(
+        pl.col("date").filter(pl.col("isXmasTime")).dt.year().n_unique().alias("xmasYears"),
+        (pl.col("streams").filter(pl.col("isXmasTime")).mean()/pl.col("streams").filter(~pl.col("isXmasTime")).mean()).alias("xmasIndex"),
+    )
+    .filter(pl.col("xmasYears").eq(5))
+    .sort("xmasIndex", descending=True)
+    .group_by("continent")
+    .head(2)
+    .collect()
+)
+    '''
+)
