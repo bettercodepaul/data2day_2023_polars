@@ -1,7 +1,7 @@
 (deutsche Version: [🇩🇪](#deutsche-Version))
 # data2day 2023 - Hands-on workshop Polars: The Turbo Boost for Dataframes
 
-Material (notebooks and data) for the hands-on workshop "Polars: The Turbo Boost for Dataframes" at data2day 2023.
+Material (notebooks and data) for the hands-on workshop "Polars: The Turbo Boost for Dataframes" at data2day 2023 by [BettercallPaul](https://www.bcxp.de).
 
 The data on which the workshop is based are daily charts from Spotify from 2017-2021 for different countries.
 
@@ -21,9 +21,9 @@ For an introduction to Polars we recommend watching this talk from PyCon/PyData 
 
 The easiest way is to open the notebooks in Google Colab:
 
-- [Part 1](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_1.ipynb)
-- [Part 2](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_2.ipynb)
-- [Part 3](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_3.ipynb)
+- [Part 1](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_1.ipynb) - load, select, filter & sort
+- [Part 2](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_2.ipynb) - aggregations, joins & reshaping
+- [Part 3](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_3.ipynb) - custom expressions, lazy mode and streaming
 
 ### Local environment
 
@@ -50,7 +50,7 @@ Would you like support for your data analytics/machine learning project? We'd lo
 #### deutsche Version
 # data2day 2023 - Praxisworkshop Polars: Der Turbo Boost für Dataframes
 
-Material (Notebooks und Daten) für den Praxisworkshop "Polars: Der Turbo-Boost für Dataframes" auf der data2day 2023.
+Material (Notebooks und Daten) für den Praxisworkshop "Polars: Der Turbo-Boost für Dataframes" auf der data2day 2023 von [BettercallPaul](https://www.bcxp.de).
 
 Die Daten, auf denen der Workshop basiert, sind tägliche Charts von Spotify von 2017-2021 für verschiedene Länder.
 
@@ -69,9 +69,9 @@ Für eine Einführung in Polars empfehlen wir, zunächst diesen Vortrag von der 
 
 Am einfachsten ist es die Notebooks in Google Colab zu öffnen:
 
-- [Teil 1](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_1.ipynb)
-- [Teil 2](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_2.ipynb)
-- [Teil 3](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_3.ipynb)
+- [Teil 1](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_1.ipynb) - Laden, Select, Filtern & Sortieren
+- [Teil 2](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_2.ipynb) - Aggregationen, Joins & Reshaping
+- [Teil 3](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_3.ipynb) - Custom Expressions, Lazy Mode und Streaming
 
 ### Lokale Umgebung
 
