@@ -78,7 +78,7 @@ class HintSolution:
 
     def check(self, *args):
         if type(args[0]) == type(Ellipsis):
-            print("❓ Moment, die drei Punkte musst du mit deiner Lösung ersetzen!")
+            print("❓ Hold on, you have to replace the ellipsis with your solution!")
             return
         try:
             self._check(*args)
@@ -424,9 +424,9 @@ def q15_check(result):
 
 q15 = HintSolution(
     '''
-Calculate for each song the romantic 💕 valentines index ("valentinesIndex") as the average number of streams
+Calculate for each song the romantic 💕 Valentine's Index ("valentinesIndex") as the average number of streams
 on Valentine's Day divided by the average number of streams on all other days.
-Filter on the 5 most romantic songs 😍 🎶 😍 that charted on Valentines Day in each year.
+Filter on the 5 most romantic songs 😍 🎶 😍 that charted on Valentine's Day in each year.
 Plot the streams for the most romantic song.
     ''',
     q15_check,
