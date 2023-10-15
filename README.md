@@ -43,6 +43,8 @@ If you like the material please leave us a star.
 
 Bugs, suggestions or request for additional topics? [Create an issue](https://github.com/bettercodepaul/data2day_2023_polars/issues/new/choose)!
 
+Would you like support for your data analytics/machine learning project? We'd love to help, you just [BettercallPaul](mailto:sayhi@bcxp.de).
+
 ---
 
 #### deutsche Version
@@ -89,3 +91,5 @@ Eine lokale Umgebung ist auch möglich. Gegebenenfalls müsst ihr ein paar Anpas
 Wenn dir das Material gefällt, hinterlasse uns bitte einen Stern.
 
 Bugs, Vorschläge oder Wünsche für zusätzliche Themen? [Erstelle ein Ticket](https://github.com/bettercodepaul/data2day_2023_polars/issues/new/choose)!
+
+Benötigst du Unterstützung für dein Projekt im Bereich Data Analytics/Machine Learning? Wir würden uns freuen zu helfen, you just [BettercallPaul](mailto:sayhi@bcxp.de).
