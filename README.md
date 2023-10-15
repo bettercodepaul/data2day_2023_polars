@@ -1,27 +1,91 @@
-# data2day 2023 - Praxisworkshop Polars
+(deutsche Version: [🇩🇪](#deutsche-Version))
+# data2day 2023 - Hands-on workshop Polars: The Turbo Boost for Dataframes
 
-Material (Notebooks und Daten) für den "Praxisworkshop Polars: Der Turbo Boost für Dataframes" auf der data2day 2023.
+Material (notebooks and data) for the hands-on workshop "Polars: The Turbo Boost for Dataframes" at data2day 2023.
+
+The data on which the workshop is based are daily charts from Spotify from 2017-2021 for different countries.
+
+The ingredients that make the workshop interesting and entertaining:
+
+- 👐 Strict focus on practical application from the very beginning
+- 💪 25 exercises of increasing difficulty to make sure you can apply the concepts in practice
+- 😀 an exercise system that includes on-demand hints and solutions make exercises fun
+- 😮 surprising insights: What are the most popular Christmas songs? Which songs are suitable for a romantic evening?
+- 🎧 the possibility to listen to your data wrangling: every song can be played directly in the jupyter notebook
+
+For an introduction to Polars we recommend watching this talk from PyCon/PyData Berlin 2023 first: https://www.youtube.com/watch?v=CtkMzCIXOWk
+
+## Using the notebooks
+
+### Colab
+
+The easiest way is to open the notebooks in Google Colab:
+
+- [Part 1](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_1.ipynb)
+- [Part 2](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_2.ipynb)
+- [Part 3](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_3.ipynb)
+
+### Local environment
+
+A local environment is also possible. You may have to make a few adjustments to the notebooks and install Graphviz to display the execution plans.
+
+- `python -m venv venv` or `python3 -m venv venv` or on Windows `py -3.10 -m venv venv`
+- `pip install --ignore-installed -r requirements.txt`
+
+## Additional material
+
+- technical backgrounds from Ritchie, the original developer of Polars: http://www.ritchievink.com/blog/2021/02/28/i-wrote-one-of-the-fastest-dataframe-libraries/
+- the cheat sheet: https://franzdiebold.github.io/polars-cheat-sheet/Polars_cheat_sheet.pdf
+
+## Feedback
+
+If you like the material please leave us a star.
+
+Bugs, suggestions or request for additional topics? [Create an issue](https://github.com/bettercodepaul/data2day_2023_polars/issues/new/choose)!
+
+---
+
+#### deutsche Version
+# data2day 2023 - Praxisworkshop Polars: Der Turbo Boost für Dataframes
+
+Material (Notebooks und Daten) für den Praxisworkshop "Polars: Der Turbo-Boost für Dataframes" auf der data2day 2023.
+
+Die Daten, auf denen der Workshop basiert, sind tägliche Charts von Spotify von 2017-2021 für verschiedene Länder.
+
+Die Zutaten, die den Workshop interessant und unterhaltsam machen:
+
+- 👐 Strikter Fokus auf die praktische Anwendung von Anfang an
+- 💪 25 Übungen mit steigendem Schwierigkeitsgrad, um sicherzustellen, dass du die Konzepte in der Praxis anwenden kannst
+- 😀 ein Übungssystem mit On-Demand-Tipps und Lösungen sorgt dafür, dass die Übungen Spaß machen
+- 😮 überraschende Insights: Welches sind die beliebtesten Weihnachtslieder? Welche Lieder eignen sich für einen romantischen Abend?
+- 🎧 die Möglichkeit, sich die eigenen Datenanalysen anzuhören: Jedes Lied kann direkt im Jupyter-Notebook abgespielt werden
+
+Für eine Einführung in Polars empfehlen wir, zunächst diesen Vortrag von der PyCon/PyData Berlin 2023 anzusehen: https://www.youtube.com/watch?v=CtkMzCIXOWk
 ## Nutzung der Notebooks
 
 ### Colab
 
-Am einfachsten ist es die Notebooks in Google Colab zu öffnen. In jedem Notebook gibt es ganz oben einen Link, der Notebook direkt in Colab öffnet.
+Am einfachsten ist es die Notebooks in Google Colab zu öffnen:
 
-- [Teil 1](https://github.com/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_1.ipynb)
-- [Teil 2](https://github.com/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_2.ipynb)
-- [Teil 3](https://github.com/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_3.ipynb)
+- [Teil 1](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_1.ipynb)
+- [Teil 2](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_2.ipynb)
+- [Teil 3](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_3.ipynb)
 
 ### Lokale Umgebung
 
 Eine lokale Umgebung ist auch möglich. Gegebenenfalls müsst ihr ein paar Anpassungen an den Notebooks vornehmen und für die Anzeige der Ausführungspläne Graphviz installieren.
 
-- `python -m venv venv` or `python3 -m venv venv` or on Windows `py -3.10 -m venv venv`
+- `python -m venv venv` or `python3 -m venv venv` oder in Windows `py -3.10 -m venv venv`
 - `pip install --ignore-installed -r requirements.txt`
 
 ## Zusätzliches Material
 
 - technische Hintergründe von Ritchie, dem ursprünglichen Entwickler von Polars: http://www.ritchievink.com/blog/2021/02/28/i-wrote-one-of-the-fastest-dataframe-libraries/
 
-- das Cheat-Sheet: https://franzdiebold.github.io/polars-cheat-sheet/Polars_cheat_sheet.pdf
+- ein Cheat-Sheet: https://franzdiebold.github.io/polars-cheat-sheet/Polars_cheat_sheet.pdf
 
-- ein Video von der PyData mit einer Übersicht zu Polars: https://www.youtube.com/watch?v=CtkMzCIXOWk
+## Feedback
+
+Wenn dir das Material gefällt, hinterlasse uns bitte einen Stern.
+
+Bugs, Vorschläge oder Wünsche für zusätzliche Themen? [Erstelle ein Ticket](https://github.com/bettercodepaul/data2day_2023_polars/issues/new/choose)!
