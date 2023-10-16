@@ -15,12 +15,17 @@ The ingredients that make the workshop interesting and entertaining:
 
 For an introduction to Polars we recommend watching this talk from PyCon/PyData Berlin 2023 first: https://www.youtube.com/watch?v=CtkMzCIXOWk
 
+## Prerequisites
+
+You should have basic knowledge of a structured data processing technology, e.g. Pandas, SQL or Apache Spark.
+
 ## Using the notebooks
 
 ### Colab
 
 The easiest way is to open the notebooks in Google Colab:
 
+- [Colab Intro](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/colab_intro_en.ipynb) - Optional, if you don't know Jupyter/Colab
 - [Part 1](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_1.ipynb) - load, select, filter & sort
 - [Part 2](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_2.ipynb) - aggregations, joins & reshaping
 - [Part 3](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Part_3.ipynb) - custom expressions, lazy mode and streaming
@@ -63,12 +68,18 @@ Die Zutaten, die den Workshop interessant und unterhaltsam machen:
 - 🎧 die Möglichkeit, sich die eigenen Datenanalysen anzuhören: Jedes Lied kann direkt im Jupyter-Notebook abgespielt werden
 
 Für eine Einführung in Polars empfehlen wir, zunächst diesen Vortrag von der PyCon/PyData Berlin 2023 anzusehen: https://www.youtube.com/watch?v=CtkMzCIXOWk
+
+## Voraussetzungen
+
+Du solltest Grundkenntnisse in einer strukturierten Datenverarbeitungstechnologie haben, z.B. Pandas, SQL oder Apache Spark.
+
 ## Nutzung der Notebooks
 
 ### Colab
 
 Am einfachsten ist es die Notebooks in Google Colab zu öffnen:
 
+- [Colab Intro](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/colab_intro.ipynb) - Optional, falls Jupyter/Colab nicht bekannt ist
 - [Teil 1](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_1.ipynb) - Laden, Select, Filtern & Sortieren
 - [Teil 2](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_2.ipynb) - Aggregationen, Joins & Reshaping
 - [Teil 3](https://colab.research.google.com/github/bettercodepaul/data2day_2023_polars/blob/main/data2day_2023_Polars_Teil_3.ipynb) - Custom Expressions, Lazy Mode und Streaming
