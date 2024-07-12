@@ -196,7 +196,7 @@ def q6_check(result):
         "date_min": ["2017-11-11", "2017-11-11"],
         "date_max": ["2021-12-20", "2021-12-20"]
     }).with_columns(pl.col("date_min", "date_max").str.to_date())
-    actual = result.select("title", "artist", pl.col("date").min().suffix("_min"), pl.col("date").max().suffix("_max")).unique()
+    actual = result.select("title", "artist", pl.col("date").min().name.suffix("_min"), pl.col("date").max().name.suffix("_max")).unique()
     assert_frame_equal(expected, actual, check_row_order=False, check_column_order=False)
 
 q6 = HintSolution(
@@ -223,7 +223,7 @@ def q7_check(result):
         "date_min": ["2017-12-24"],
         "date_max": ["2020-12-25"]
     }).with_columns(pl.col("date_min", "date_max").str.to_date())
-    actual = result.select("title", "artist", pl.col("date").min().suffix("_min"), pl.col("date").max().suffix("_max")).unique()
+    actual = result.select("title", "artist", pl.col("date").min().name.suffix("_min"), pl.col("date").max().name.suffix("_max")).unique()
     assert_frame_equal(expected, actual, check_row_order=False, check_column_order=False)
 
 q7 = HintSolution(
