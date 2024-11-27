@@ -567,7 +567,7 @@ q19_df = (df
     .filter(pl.col("rank").eq(1))
     .group_by("artist", pl.col("date").dt.year().alias("year"))
     .agg(pl.col("title").n_unique().alias("numberOnes"))
-    .pivot(index="artist", columns="year", values="numberOnes")
+    .pivot(index="artist", on="year", values="numberOnes")
     .fill_null(0)
     .with_columns(pl.sum_horizontal(pl.all().exclude("artist")).alias("allYears"))
     .top_k(6, by="allYears")
