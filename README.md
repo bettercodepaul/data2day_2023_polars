@@ -1,3 +1,5 @@
+The most current version of this workshop including updated and additional material is [here](https://github.com/bettercodepaul/data-wrangling-workshop).
+
 (deutsche Version: [🇩🇪](#deutsche-Version))
 # data2day 2023 - Hands-on workshop Polars: The Turbo Boost for Dataframes
 
